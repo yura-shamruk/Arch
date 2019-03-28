@@ -7,8 +7,14 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 
 import com.shamruk.arch.R
+import com.shamruk.arch.utils.RxUtil
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
+import kotlinx.android.synthetic.main.sample_list_fragment.*
 
 class MainListFragment : Fragment() {
 
@@ -20,18 +26,55 @@ class MainListFragment : Fragment() {
 
     private lateinit var viewModel: MainListViewModel
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    private var compactDisposable: CompositeDisposable = CompositeDisposable()
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.sample_list_fragment, container, false)
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProviders.of(this).get(MainListViewModel::class.java)
-        // TODO: Use the ViewModel
     }
 
+    override fun onResume() {
+        super.onResume()
+        bindViewModel()
+    }
 
+    override fun onPause() {
+        super.onPause()
+        unbindViewModel()
+    }
+
+    private fun unbindViewModel(){
+        compactDisposable.clear()
+    }
+
+    private fun bindViewModel() {
+        compactDisposable.add(viewModel.getTestList()
+            .compose(RxUtil.io())
+            .subscribe(this::onTestListReceive, this::onTestListError))
+
+        compactDisposable.add(viewModel.getLoadingStateObservable()
+            .compose(RxUtil.io())
+            .subscribe{state: Boolean -> onLoadingStateChanged(state) })
+    }
+
+    private fun onLoadingStateChanged(state: Boolean) {
+        if(state){
+            progressBar.visibility = View.VISIBLE
+        } else{
+            progressBar.visibility = View.INVISIBLE
+        }
+    }
+
+    private fun onTestListError(error: Throwable) {
+        Log.d(TAG, "onTestListError: " + error.message)
+    }
+
+    private fun onTestListReceive(testList: List<String>) {
+        Log.d(TAG, "onTestListReceive:$testList")
+        Toast.makeText(context, "onTestListReceive:$testList", Toast.LENGTH_SHORT).show()
+    }
 }
