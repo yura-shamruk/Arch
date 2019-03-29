@@ -9,12 +9,21 @@ import io.reactivex.schedulers.Schedulers
 
 class RxUtil {
     companion object {
-        fun <T> io(): ObservableTransformer<T, T> {
+        fun <T> ioObservable(): ObservableTransformer<T, T> {
             return ObservableTransformer { observable ->
                 observable
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
             }
         }
+
+        fun <T> ioSingle(): SingleTransformer<T, T> {
+            return SingleTransformer { observable ->
+                observable
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+            }
+        }
+
     }
 }

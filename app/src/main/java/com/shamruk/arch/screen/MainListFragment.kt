@@ -8,12 +8,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.shamruk.arch.R
+import com.shamruk.arch.adapter.MainListAdapter
 import com.shamruk.arch.utils.RxUtil
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.sample_list_fragment.*
 
 class MainListFragment : Fragment() {
@@ -25,6 +25,8 @@ class MainListFragment : Fragment() {
     }
 
     private lateinit var viewModel: MainListViewModel
+
+    private lateinit var linearLayoutManager: LinearLayoutManager
 
     private var compactDisposable: CompositeDisposable = CompositeDisposable()
 
@@ -53,11 +55,11 @@ class MainListFragment : Fragment() {
 
     private fun bindViewModel() {
         compactDisposable.add(viewModel.getTestList()
-            .compose(RxUtil.io())
+            .compose(RxUtil.ioSingle())
             .subscribe(this::onTestListReceive, this::onTestListError))
 
         compactDisposable.add(viewModel.getLoadingStateObservable()
-            .compose(RxUtil.io())
+            .compose(RxUtil.ioObservable())
             .subscribe{state: Boolean -> onLoadingStateChanged(state) })
     }
 
@@ -76,5 +78,9 @@ class MainListFragment : Fragment() {
     private fun onTestListReceive(testList: List<String>) {
         Log.d(TAG, "onTestListReceive:$testList")
         Toast.makeText(context, "onTestListReceive:$testList", Toast.LENGTH_SHORT).show()
+        val adapter = MainListAdapter(testList)
+        mainListRecycler.adapter = adapter
+        linearLayoutManager = LinearLayoutManager(context)
+        mainListRecycler.layoutManager = linearLayoutManager
     }
 }
