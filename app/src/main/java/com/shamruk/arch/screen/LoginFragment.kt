@@ -8,7 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
-import com.shamruk.arch.R
+import com.shamruk.arch.databinding.LoginFragmentBinding
 
 class LoginFragment : Fragment() {
 
@@ -18,20 +18,24 @@ class LoginFragment : Fragment() {
         fun newInstance() = LoginFragment()
     }
 
-    private lateinit var viewModel: LoginViewModel
+
+    private lateinit var viewDataBinding: LoginFragmentBinding
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.login_fragment, container, false)
+        viewDataBinding = LoginFragmentBinding.inflate(inflater, container, false)
+        return viewDataBinding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
-        // TODO: Use the ViewModel
+        viewDataBinding.viewmodel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
     }
 
-
+    override fun onResume() {
+        super.onResume()
+        viewDataBinding.viewmodel?.start()
+    }
 }
