@@ -11,7 +11,8 @@ class MockServer {
 
         fun getLoginTitles(): LoginTitles {
             Thread.sleep(3000)
-            return LoginTitles("Title", "Subtitle")
+            return LoginTitles("Title", "Subtitle",
+                "https://www.nretnil.com/avatar/LawrenceEzekielAmos.png")
         }
     }
 }

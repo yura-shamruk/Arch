@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 
 import com.shamruk.arch.databinding.LoginFragmentBinding
+import com.squareup.picasso.Picasso
 
 class LoginFragment : Fragment() {
 
@@ -32,6 +33,7 @@ class LoginFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewDataBinding.viewmodel = ViewModelProviders.of(this).get(LoginViewModel::class.java)
+        viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
     }
 
     override fun onResume() {
