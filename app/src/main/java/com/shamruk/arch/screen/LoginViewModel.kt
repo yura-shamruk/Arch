@@ -19,17 +19,11 @@ import com.squareup.picasso.Picasso
 class LoginViewModel : ViewModel() {
     var titleText = ObservableField<String>()
 
-    private val _subtitleText = MutableLiveData<String>()
-    val subtitleText: LiveData<String>
-        get() = _subtitleText
+    val subtitleText = MutableLiveData<String>()
 
-    private val _avatarUrl = MutableLiveData<String>()
-    val avatarUrl: LiveData<String>
-        get() = _avatarUrl
+    val avatarUrl = MutableLiveData<String>()
 
-    private val _isProgressVisible = MutableLiveData<Boolean>()
-    val isProgressVisible: LiveData<Boolean>
-        get() = _isProgressVisible
+    val isProgressVisible = MutableLiveData<Boolean>()
 
     private val disposables: CompositeDisposable = CompositeDisposable()
 
@@ -63,15 +57,15 @@ class LoginViewModel : ViewModel() {
 
     private fun onTitlesReceive(titles: LoginTitles?) {
         titleText.set(titles?.title)
-        _subtitleText.value = titles?.subtitle
-        _avatarUrl.value = titles?.url
+        subtitleText.value = titles?.subtitle
+        avatarUrl.value = titles?.url
     }
 
     private fun showProgress(){
-        _isProgressVisible.value = true
+        isProgressVisible.value = true
     }
 
     private fun hideProgress(){
-        _isProgressVisible.value = false
+        isProgressVisible.value = false
     }
 }
