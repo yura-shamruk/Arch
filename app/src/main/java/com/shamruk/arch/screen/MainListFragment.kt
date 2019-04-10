@@ -42,6 +42,7 @@ class MainListFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         bindViewModel()
+        viewModel.start()
     }
 
     override fun onPause() {
@@ -54,8 +55,8 @@ class MainListFragment : Fragment() {
     }
 
     private fun bindViewModel() {
-        compactDisposable.add(viewModel.getTestList()
-            .compose(RxUtil.ioSingle())
+        compactDisposable.add(viewModel.getTestListObservable()
+            .compose(RxUtil.ioObservable())
             .subscribe(this::onTestListReceive, this::onTestListError))
 
         compactDisposable.add(viewModel.getLoadingStateObservable()
