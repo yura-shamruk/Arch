@@ -6,6 +6,10 @@ import io.reactivex.disposables.CompositeDisposable
 
 abstract class BaseFragment : Fragment(){
 
+    companion object {
+        const val TAG = "BaseFragment"
+    }
+
     protected var compactDisposable: CompositeDisposable = CompositeDisposable()
 
     protected fun unbindViewModel(){
@@ -13,4 +17,9 @@ abstract class BaseFragment : Fragment(){
     }
 
     protected abstract fun bindViewModel()
+
+    fun getFragmentName(): String{
+        return TAG
+    }
+
 }

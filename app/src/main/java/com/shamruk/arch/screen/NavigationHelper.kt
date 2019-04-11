@@ -19,5 +19,12 @@ class NavigationHelper {
             transaction.addToBackStack(null)
             transaction.commit()
         }
+
+        fun showFragment(fragmentManager: FragmentManager, rootLayout: Int, fragment:BaseFragment){
+            val transaction = fragmentManager.beginTransaction()
+            transaction.replace(rootLayout, fragment, fragment.getFragmentName())
+            transaction.addToBackStack(null)
+            transaction.commit()
+        }
     }
 }
