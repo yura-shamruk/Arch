@@ -1,6 +1,6 @@
 package com.shamruk.arch.api
 
-import com.shamruk.arch.model.LoginTitles
+import com.shamruk.arch.model.UserDetails
 import io.reactivex.Single
 
 object ProjectsRepository {
@@ -11,9 +11,9 @@ object ProjectsRepository {
         }
     }
 
-    fun getLoginTitles():Single<LoginTitles> {
+    fun getLoginTitles():Single<UserDetails> {
         return Single.create { emitter ->
-            val testList = MockServer.getLoginTitles()
+            val testList = MockServer.getUserDetails()
             emitter.onSuccess(testList)
         }
     }

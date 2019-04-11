@@ -1,64 +1,54 @@
 package com.shamruk.arch.screen
 
 import androidx.lifecycle.ViewModel;
-import androidx.databinding.ObservableField
-import androidx.databinding.Bindable
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.shamruk.arch.api.ProjectsRepository
-import com.shamruk.arch.model.LoginTitles
+import com.shamruk.arch.model.UserDetails
 import com.shamruk.arch.utils.RxUtil
 import io.reactivex.disposables.CompositeDisposable
-import android.R
 import android.util.Log
 import android.widget.ImageView
 import androidx.databinding.BindingAdapter
 import com.squareup.picasso.Picasso
 
 
-class LoginViewModel : ViewModel() {
-    var titleText = ObservableField<String>()
+class LoginViewModel : BaseViewModel() {
+    var nameText = MutableLiveData<String>()
 
-    val subtitleText = MutableLiveData<String>()
+    val lastNameText = MutableLiveData<String>()
 
     val avatarUrl = MutableLiveData<String>()
 
     val isProgressVisible = MutableLiveData<Boolean>()
 
-    private val disposables: CompositeDisposable = CompositeDisposable()
-
     companion object {
         @BindingAdapter("imageUrl")
         @JvmStatic
         fun loadUrl(view: ImageView, imageUrl: String?) {
-            Log.d("loadUrl", "url: $imageUrl")
+            Log.d("loadUrl", "avatarUrl: $imageUrl")
             Picasso.get()
                 .load(imageUrl)
                 .into(view)
         }
     }
 
-    fun start(){
+    override fun start(){
         showProgress()
         disposables.add(ProjectsRepository.getLoginTitles()
             .compose(RxUtil.ioSingle())
             .doFinally { hideProgress() }
-            .subscribe({titles ->  onTitlesReceive(titles)}, {t -> onTitlesError(t) }))
+            .subscribe({titles ->  onUserDetailsReceive(titles)}, { t -> onUserDetailsError(t) }))
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        disposables.clear()
-    }
 
-    private fun onTitlesError(t: Throwable?) {
+    private fun onUserDetailsError(t: Throwable?) {
 
     }
 
-    private fun onTitlesReceive(titles: LoginTitles?) {
-        titleText.set(titles?.title)
-        subtitleText.value = titles?.subtitle
-        avatarUrl.value = titles?.url
+    private fun onUserDetailsReceive(titles: UserDetails?) {
+        nameText.value = titles?.name
+        lastNameText.value = titles?.lastName
+        avatarUrl.value = titles?.avatarUrl
     }
 
     private fun showProgress(){
