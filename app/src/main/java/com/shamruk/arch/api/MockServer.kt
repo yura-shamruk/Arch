@@ -1,6 +1,6 @@
 package com.shamruk.arch.api
 
-import com.shamruk.arch.model.LoginTitles
+import com.shamruk.arch.model.LoginUserDetails
 
 class MockServer {
     companion object {
@@ -9,9 +9,9 @@ class MockServer {
             return listOf("First", "Second", "Third")
         }
 
-        fun getLoginTitles(): LoginTitles {
+        fun getUserDetails(): LoginUserDetails {
             Thread.sleep(3000)
-            return LoginTitles("Title", "Subtitle",
+            return LoginUserDetails("Title", "Subtitle",
                 "https://www.nretnil.com/avatar/LawrenceEzekielAmos.png")
         }
     }

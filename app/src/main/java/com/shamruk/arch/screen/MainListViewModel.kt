@@ -14,7 +14,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import kotlinx.android.synthetic.main.sample_list_fragment.*
 
-class MainListViewModel : ViewModel() {
+class MainListViewModel : BaseViewModel() {
 
     private var loadingStateSubject: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
@@ -22,36 +22,26 @@ class MainListViewModel : ViewModel() {
 
     private var testList: List<String>? = null
 
-    private val disposables: CompositeDisposable = CompositeDisposable()
-
-
     fun getLoadingStateObservable(): Observable<Boolean> {
         return loadingStateSubject.hide()
     }
 
-    fun getTestListObservable(): Observable<List<String>>{
+    fun getTestListObservable(): Observable<List<String>> {
         return testListSubject.hide()
     }
 
-    fun start() {
+    override fun start() {
         disposables.add(getTestList()
             .compose(RxUtil.ioSingle())
+            .doFinally { loadingStateSubject.onNext(false) }
             .subscribe(this::onTestListReceive, this::onTestListError))
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        disposables.clear()
     }
 
     private fun getTestList(): Single<List<String>> {
         return if (testList == null) {
             ProjectsRepository.getTestList()
                 .doOnSubscribe { loadingStateSubject.onNext(true) }
-                .doOnSuccess {
-                    loadingStateSubject.onNext(false)
-                    testList = it
-                }
+                .doOnSuccess { testList = it }
         } else {
             Single.create { emitter ->
                 emitter.onSuccess(testList!!)

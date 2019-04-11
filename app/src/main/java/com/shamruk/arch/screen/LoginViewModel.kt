@@ -1,71 +1,59 @@
 package com.shamruk.arch.screen
 
 import androidx.lifecycle.ViewModel;
-import androidx.databinding.ObservableField
-import androidx.databinding.Bindable
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.shamruk.arch.api.ProjectsRepository
-import com.shamruk.arch.model.LoginTitles
+import com.shamruk.arch.model.LoginUserDetails
 import com.shamruk.arch.utils.RxUtil
+import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
-import android.R
-import android.util.Log
-import android.widget.ImageView
-import androidx.databinding.BindingAdapter
-import com.squareup.picasso.Picasso
+import io.reactivex.subjects.BehaviorSubject
 
 
-class LoginViewModel : ViewModel() {
-    var titleText = ObservableField<String>()
+class LoginViewModel : BaseViewModel() {
 
-    val subtitleText = MutableLiveData<String>()
+    private var userDetails: LoginUserDetails? = null
 
-    val avatarUrl = MutableLiveData<String>()
+    var loginTitle: BehaviorSubject<LoginUserDetails> = BehaviorSubject.create()
 
-    val isProgressVisible = MutableLiveData<Boolean>()
+    var isProgressSubject: BehaviorSubject<Boolean> = BehaviorSubject.create()
 
-    private val disposables: CompositeDisposable = CompositeDisposable()
 
-    companion object {
-        @BindingAdapter("imageUrl")
-        @JvmStatic
-        fun loadUrl(view: ImageView, imageUrl: String?) {
-            Log.d("loadUrl", "url: $imageUrl")
-            Picasso.get()
-                .load(imageUrl)
-                .into(view)
+    override fun start() {
+        showProgress()
+
+        disposables.add(getUserDetailsObservable()
+            .compose(RxUtil.ioSingle())
+            .doFinally { hideProgress() }
+            .subscribe({t: LoginUserDetails? -> onUserDetailsReceive(t)}, {t -> onUserDetailsError(t) }))
+    }
+
+    private fun getUserDetailsObservable(): Single<LoginUserDetails> {
+        return if (userDetails == null) {
+            ProjectsRepository.getUserDetails()
+                .doOnSuccess { t -> userDetails = t }
+        } else {
+            Single.create { emitter ->
+                emitter.onSuccess(userDetails!!)
+            }
         }
     }
 
-    fun start(){
-        showProgress()
-        disposables.add(ProjectsRepository.getLoginTitles()
-            .compose(RxUtil.ioSingle())
-            .doFinally { hideProgress() }
-            .subscribe({titles ->  onTitlesReceive(titles)}, {t -> onTitlesError(t) }))
-    }
 
-    override fun onCleared() {
-        super.onCleared()
-        disposables.clear()
-    }
-
-    private fun onTitlesError(t: Throwable?) {
+    private fun onUserDetailsError(t: Throwable?) {
 
     }
 
-    private fun onTitlesReceive(titles: LoginTitles?) {
-        titleText.set(titles?.title)
-        subtitleText.value = titles?.subtitle
-        avatarUrl.value = titles?.url
+    private fun onUserDetailsReceive(userDetails: LoginUserDetails?) {
+        userDetails?.let { loginTitle.onNext(it) }
     }
 
-    private fun showProgress(){
-        isProgressVisible.value = true
+    private fun showProgress() {
+        isProgressSubject.onNext(true)
     }
 
-    private fun hideProgress(){
-        isProgressVisible.value = false
+    private fun hideProgress() {
+        isProgressSubject.onNext(false)
     }
+
+
 }

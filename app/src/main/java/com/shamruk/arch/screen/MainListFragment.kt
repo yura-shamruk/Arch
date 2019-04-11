@@ -16,7 +16,7 @@ import com.shamruk.arch.utils.RxUtil
 import io.reactivex.disposables.CompositeDisposable
 import kotlinx.android.synthetic.main.sample_list_fragment.*
 
-class MainListFragment : Fragment() {
+class MainListFragment : BaseFragment() {
 
     companion object {
         const val TAG: String = "MainListFragment"
@@ -28,7 +28,6 @@ class MainListFragment : Fragment() {
 
     private lateinit var linearLayoutManager: LinearLayoutManager
 
-    private var compactDisposable: CompositeDisposable = CompositeDisposable()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.sample_list_fragment, container, false)
@@ -50,11 +49,8 @@ class MainListFragment : Fragment() {
         unbindViewModel()
     }
 
-    private fun unbindViewModel(){
-        compactDisposable.clear()
-    }
 
-    private fun bindViewModel() {
+    override fun bindViewModel() {
         compactDisposable.add(viewModel.getTestListObservable()
             .compose(RxUtil.ioObservable())
             .subscribe(this::onTestListReceive, this::onTestListError))
@@ -78,7 +74,6 @@ class MainListFragment : Fragment() {
 
     private fun onTestListReceive(testList: List<String>) {
         Log.d(TAG, "onTestListReceive:$testList")
-        Toast.makeText(context, "onTestListReceive:$testList", Toast.LENGTH_SHORT).show()
         val adapter = MainListAdapter(testList)
         mainListRecycler.adapter = adapter
         linearLayoutManager = LinearLayoutManager(context)
