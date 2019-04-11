@@ -11,7 +11,7 @@ import android.view.ViewGroup
 import com.shamruk.arch.databinding.LoginFragmentBinding
 import com.squareup.picasso.Picasso
 
-class LoginFragment : Fragment() {
+class LoginFragment : BaseFragment() {
 
     companion object {
         const val TAG: String = "LoginFragment"
@@ -39,5 +39,9 @@ class LoginFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         viewDataBinding.viewmodel?.start()
+    }
+
+    override fun getFragmentName():String{
+        return MainListFragment.TAG
     }
 }

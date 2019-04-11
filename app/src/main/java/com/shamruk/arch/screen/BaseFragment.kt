@@ -10,15 +10,8 @@ abstract class BaseFragment : Fragment(){
         const val TAG = "BaseFragment"
     }
 
-    protected var compactDisposable: CompositeDisposable = CompositeDisposable()
 
-    protected fun unbindViewModel(){
-        compactDisposable.clear()
-    }
-
-    protected abstract fun bindViewModel()
-
-    fun getFragmentName(): String{
+    open fun getFragmentName(): String{
         return TAG
     }
 

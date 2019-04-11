@@ -12,9 +12,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 
 import com.shamruk.arch.R
 import com.shamruk.arch.adapter.MainListAdapter
+import com.shamruk.arch.databinding.MainListFragmentBinding
 import com.shamruk.arch.utils.RxUtil
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.android.synthetic.main.sample_list_fragment.*
+import kotlinx.android.synthetic.main.main_list_fragment.*
+import java.util.ArrayList
 
 class MainListFragment : BaseFragment() {
 
@@ -28,54 +30,44 @@ class MainListFragment : BaseFragment() {
 
     private lateinit var linearLayoutManager: LinearLayoutManager
 
+    private lateinit var listAdapter: MainListAdapter
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.sample_list_fragment, container, false)
+    private lateinit var viewDataBinding: MainListFragmentBinding
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        viewDataBinding = MainListFragmentBinding.inflate(inflater, container, false)
+        return viewDataBinding.root
     }
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        viewModel = ViewModelProviders.of(this).get(MainListViewModel::class.java)
+        viewDataBinding.viewModel = ViewModelProviders.of(this).get(MainListViewModel::class.java)
+        viewDataBinding.lifecycleOwner = this.viewLifecycleOwner
+        setupListAdapter()
     }
 
     override fun onResume() {
         super.onResume()
-        bindViewModel()
-        viewModel.start()
+        viewDataBinding.viewModel?.start()
     }
 
-    override fun onPause() {
-        super.onPause()
-        unbindViewModel()
+    override fun getFragmentName():String{
+        return TAG
     }
 
-    override fun bindViewModel() {
-        compactDisposable.add(viewModel.getTestListObservable()
-            .compose(RxUtil.ioObservable())
-            .subscribe(this::onTestListReceive, this::onTestListError))
-
-        compactDisposable.add(viewModel.getLoadingStateObservable()
-            .compose(RxUtil.ioObservable())
-            .subscribe{state: Boolean -> onLoadingStateChanged(state) })
-    }
-
-    private fun onLoadingStateChanged(state: Boolean) {
-        if(state){
-            progressBar.visibility = View.VISIBLE
-        } else{
-            progressBar.visibility = View.INVISIBLE
+    private fun setupListAdapter() {
+        val viewModel = viewDataBinding.viewModel
+        if (viewModel != null) {
+            listAdapter = MainListAdapter()
+            val mainListRecycler = viewDataBinding.mainListRecycler
+            mainListRecycler.adapter = listAdapter
+            linearLayoutManager = LinearLayoutManager(context)
+            mainListRecycler.layoutManager = linearLayoutManager
+        } else {
+            Log.w(TAG, "ViewModel not initialized when attempting to set up adapter.")
         }
-    }
-
-    private fun onTestListError(error: Throwable) {
-        Log.d(TAG, "onTestListError: " + error.message)
-    }
-
-    private fun onTestListReceive(testList: List<String>) {
-        Log.d(TAG, "onTestListReceive:$testList")
-        val adapter = MainListAdapter(testList)
-        mainListRecycler.adapter = adapter
-        linearLayoutManager = LinearLayoutManager(context)
-        mainListRecycler.layoutManager = linearLayoutManager
     }
 }
