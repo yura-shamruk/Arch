@@ -7,6 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.shamruk.arch.adapter.MainListAdapter
 import com.shamruk.arch.api.ProjectsRepository
+import com.shamruk.arch.model.User
 import com.shamruk.arch.utils.RxUtil
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
@@ -15,19 +16,7 @@ class MainListViewModel : BaseViewModel() {
 
     val isProgressVisible = MutableLiveData<Boolean>()
 
-//    var items: List<String> = ArrayList<String>()
-    val items = MutableLiveData<List<String>>().apply { value = emptyList() }
-
-    companion object {
-        @BindingAdapter("items")
-        @JvmStatic fun setItems(recyclerView: RecyclerView, items: List<String>) {
-            val adapter = recyclerView.adapter
-            if(adapter is MainListAdapter){
-                adapter.replaceData(items)
-            }
-        }
-    }
-
+    val items = MutableLiveData<List<User>>().apply { value = emptyList() }
 
     override fun start() {
         showProgress()
@@ -42,7 +31,8 @@ class MainListViewModel : BaseViewModel() {
         Log.d(MainListFragment.TAG, "onTestListError: " + error.message)
     }
 
-    private fun onTestListReceive(testList: List<String>) {
+
+    private fun onTestListReceive(testList: List<User>) {
         Log.d(MainListFragment.TAG, "onTestListReceive:$testList")
         items.value = testList
     }
@@ -53,5 +43,15 @@ class MainListViewModel : BaseViewModel() {
 
     private fun hideProgress(){
         isProgressVisible.value = false
+    }
+
+    companion object {
+        @BindingAdapter("items")
+        @JvmStatic fun setItems(recyclerView: RecyclerView, items: List<User>) {
+            val adapter = recyclerView.adapter
+            if(adapter is MainListAdapter){
+                adapter.replaceData(items)
+            }
+        }
     }
 }

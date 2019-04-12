@@ -1,12 +1,15 @@
 package com.shamruk.arch.api
 
+import com.shamruk.arch.model.User
 import com.shamruk.arch.model.UserDetails
 
 class MockServer {
     companion object {
-        fun getTestList():List<String> {
+        fun getUsers():List<User> {
             Thread.sleep(2000)
-            return listOf("First", "Second", "Third")
+            return listOf(User("Jhon", "Brown"),
+                User("James", "Brown"),
+                User("Alice", "Brown"))
         }
 
         fun getUserDetails(): UserDetails {
