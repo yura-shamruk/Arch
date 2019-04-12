@@ -47,6 +47,10 @@ class LoginFragment : BaseFragment() {
         unbindViewModel()
     }
 
+    override fun getFragmentName(): String {
+        return TAG
+    }
+
     override fun bindViewModel() {
         compactDisposable.add(viewModel.isProgressSubject
             .compose(RxUtil.ioObservable())

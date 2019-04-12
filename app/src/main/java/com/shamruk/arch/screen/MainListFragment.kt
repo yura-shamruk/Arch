@@ -49,6 +49,9 @@ class MainListFragment : BaseFragment() {
         unbindViewModel()
     }
 
+    override fun getFragmentName(): String {
+        return LoginFragment.TAG
+    }
 
     override fun bindViewModel() {
         compactDisposable.add(viewModel.getTestListObservable()
