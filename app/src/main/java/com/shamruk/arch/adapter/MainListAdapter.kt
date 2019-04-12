@@ -8,9 +8,10 @@ import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.shamruk.arch.databinding.MainListItemBinding
 import com.shamruk.arch.model.User
+import com.shamruk.arch.screen.MainListViewModel
 
 
-class MainListAdapter : RecyclerView.Adapter<MainListAdapter.ViewHolder>(){
+class MainListAdapter(private var viewModel: MainListViewModel) : RecyclerView.Adapter<MainListAdapter.ViewHolder>(){
 
     private var list: MutableList<User> = mutableListOf()
 
@@ -36,7 +37,7 @@ class MainListAdapter : RecyclerView.Adapter<MainListAdapter.ViewHolder>(){
     override fun onBindViewHolder(holder : MainListAdapter.ViewHolder, position : Int){
         val user = list[position]
         holder.bind(user)
-        holder.itemView.setOnClickListener { Log.d(TAG, "click on: " + user.name) }
+        holder.itemView.setOnClickListener { viewModel.onListItemClick(user) }
     }
 
     override fun getItemCount() : Int{

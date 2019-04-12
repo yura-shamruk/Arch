@@ -1,6 +1,7 @@
 package com.shamruk.arch.screen
 
 import android.util.Log
+import android.widget.Toast
 import androidx.databinding.BindingAdapter
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -11,10 +12,25 @@ import com.shamruk.arch.model.User
 import com.shamruk.arch.utils.RxUtil
 import io.reactivex.Single
 import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.PublishSubject
 
 class MainListViewModel : BaseViewModel() {
 
+    companion object {
+        const val TAG: String = "MainListViewModel"
+
+        @BindingAdapter("items")
+        @JvmStatic fun setItems(recyclerView: RecyclerView, items: List<User>) {
+            val adapter = recyclerView.adapter
+            if(adapter is MainListAdapter){
+                adapter.replaceData(items)
+            }
+        }
+    }
+
     val isProgressVisible = MutableLiveData<Boolean>()
+
+    val toastSubject =  BehaviorSubject.create<String>()
 
     val items = MutableLiveData<List<User>>().apply { value = emptyList() }
 
@@ -24,6 +40,11 @@ class MainListViewModel : BaseViewModel() {
             .compose(RxUtil.ioSingle())
             .doFinally { hideProgress() }
             .subscribe(this::onTestListReceive, this::onTestListError))
+    }
+
+    fun onListItemClick(user:User){
+        Log.d(TAG, "user: " + user.name)
+        toastSubject.onNext("click: " + user.name)
     }
 
 
@@ -45,13 +66,4 @@ class MainListViewModel : BaseViewModel() {
         isProgressVisible.value = false
     }
 
-    companion object {
-        @BindingAdapter("items")
-        @JvmStatic fun setItems(recyclerView: RecyclerView, items: List<User>) {
-            val adapter = recyclerView.adapter
-            if(adapter is MainListAdapter){
-                adapter.replaceData(items)
-            }
-        }
-    }
 }

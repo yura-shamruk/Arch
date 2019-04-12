@@ -26,12 +26,6 @@ class MainListFragment : BaseFragment() {
         fun newInstance() = MainListFragment()
     }
 
-    private lateinit var viewModel: MainListViewModel
-
-    private lateinit var linearLayoutManager: LinearLayoutManager
-
-    private lateinit var listAdapter: MainListAdapter
-
     private lateinit var viewDataBinding: MainListFragmentBinding
 
     override fun onCreateView(
@@ -52,6 +46,13 @@ class MainListFragment : BaseFragment() {
     override fun onResume() {
         super.onResume()
         viewDataBinding.viewModel?.start()
+        viewDataBinding.viewModel?.let { bindViewModel(it) }
+    }
+
+    private fun bindViewModel(viewModel: MainListViewModel) {
+        disposables.add(viewModel.toastSubject
+            .compose(RxUtil.ioObservable())
+            .subscribe { t -> Toast.makeText(context, t, Toast.LENGTH_SHORT).show() })
     }
 
     override fun getFragmentName():String{
@@ -61,11 +62,9 @@ class MainListFragment : BaseFragment() {
     private fun setupListAdapter() {
         val viewModel = viewDataBinding.viewModel
         if (viewModel != null) {
-            listAdapter = MainListAdapter()
             val mainListRecycler = viewDataBinding.mainListRecycler
-            mainListRecycler.adapter = listAdapter
-            linearLayoutManager = LinearLayoutManager(context)
-            mainListRecycler.layoutManager = linearLayoutManager
+            mainListRecycler.adapter = MainListAdapter(viewModel)
+            mainListRecycler.layoutManager = LinearLayoutManager(context)
         } else {
             Log.w(TAG, "ViewModel not initialized when attempting to set up adapter.")
         }
